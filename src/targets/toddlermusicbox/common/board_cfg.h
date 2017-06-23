@@ -126,6 +126,14 @@ static const LedConfig led_6_cfg =
     .drive = LED_ACTIVE_HIGH,
 };
 
+LedDriver EXT_SWITCH1;
+static const LedConfig extsw_1_cfg =
+{
+    .ledport = GPIOE,
+    .ledpad = GPIOE_EXT_DIO1,
+    .drive = LED_ACTIVE_HIGH,
+};
+
 #endif /* HAL_USE_LED */
 
 #if HAL_USE_FLASH

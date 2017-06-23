@@ -24,6 +24,8 @@
 #define LED_DECODE              &LED2
 #define LED_RFID                &LED4
 
+#define EXT_READY                &EXT_SWITCH1 //switch to give feedback to external systems
+
 #define CODEC                   &VS1053D1
 
 #define PARTITION_BL            ((BaseNVMDevice*)&nvm_part_internal_flash_bl)

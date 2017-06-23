@@ -48,6 +48,7 @@ extern LedDriver LED3;
 extern LedDriver LED4;
 extern LedDriver LED5;
 extern LedDriver LED6;
+extern LedDriver EXT_SWITCH1;
 #endif /* HAL_USE_LED */
 
 /* Internal flash */

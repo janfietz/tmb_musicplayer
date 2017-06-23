@@ -130,7 +130,7 @@
 #define GPIOE_PIN5                  5U
 #define GPIOE_PIN6                  6U
 #define GPIOE_PIN7                  7U
-#define GPIOE_PIN8                  8U
+#define GPIOE_EXT_DIO1                  8U
 #define GPIOE_PIN9                  9U
 #define GPIOE_PIN10                 10U
 #define GPIOE_PIN11                 11U
@@ -768,7 +768,7 @@
                                      PIN_MODE_INPUT(GPIOE_PIN5) |           \
                                      PIN_MODE_INPUT(GPIOE_PIN6) |           \
                                      PIN_MODE_INPUT(GPIOE_PIN7) |           \
-                                     PIN_MODE_INPUT(GPIOE_PIN8) |           \
+                                     PIN_MODE_OUTPUT(GPIOE_EXT_DIO1) |      \
                                      PIN_MODE_INPUT(GPIOE_PIN9) |           \
                                      PIN_MODE_INPUT(GPIOE_PIN10) |          \
                                      PIN_MODE_INPUT(GPIOE_PIN11) |          \
@@ -784,7 +784,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOE_PIN5) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOE_PIN6) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOE_PIN7) |       \
-                                     PIN_OTYPE_PUSHPULL(GPIOE_PIN8) |       \
+                                     PIN_OTYPE_PUSHPULL(GPIOE_EXT_DIO1) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOE_PIN9) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOE_PIN10) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOE_PIN11) |      \
@@ -800,7 +800,7 @@
                                      PIN_OSPEED_HIGH(GPIOE_PIN5) |          \
                                      PIN_OSPEED_HIGH(GPIOE_PIN6) |          \
                                      PIN_OSPEED_HIGH(GPIOE_PIN7) |          \
-                                     PIN_OSPEED_HIGH(GPIOE_PIN8) |          \
+                                     PIN_OSPEED_HIGH(GPIOE_EXT_DIO1) |          \
                                      PIN_OSPEED_HIGH(GPIOE_PIN9) |          \
                                      PIN_OSPEED_HIGH(GPIOE_PIN10) |         \
                                      PIN_OSPEED_HIGH(GPIOE_PIN11) |         \
@@ -816,7 +816,7 @@
                                      PIN_PUPDR_FLOATING(GPIOE_PIN5) |       \
                                      PIN_PUPDR_FLOATING(GPIOE_PIN6) |       \
                                      PIN_PUPDR_FLOATING(GPIOE_PIN7) |       \
-                                     PIN_PUPDR_FLOATING(GPIOE_PIN8) |       \
+                                     PIN_PUPDR_FLOATING(GPIOE_EXT_DIO1) |       \
                                      PIN_PUPDR_FLOATING(GPIOE_PIN9) |       \
                                      PIN_PUPDR_FLOATING(GPIOE_PIN10) |      \
                                      PIN_PUPDR_FLOATING(GPIOE_PIN11) |      \
@@ -832,7 +832,7 @@
                                      PIN_ODR_HIGH(GPIOE_PIN5) |             \
                                      PIN_ODR_HIGH(GPIOE_PIN6) |             \
                                      PIN_ODR_HIGH(GPIOE_PIN7) |             \
-                                     PIN_ODR_HIGH(GPIOE_PIN8) |             \
+                                     PIN_ODR_LOW(GPIOE_EXT_DIO1) |             \
                                      PIN_ODR_HIGH(GPIOE_PIN9) |             \
                                      PIN_ODR_HIGH(GPIOE_PIN10) |            \
                                      PIN_ODR_HIGH(GPIOE_PIN11) |            \
@@ -848,7 +848,7 @@
                                      PIN_AFIO_AF(GPIOE_PIN5, 0U) |          \
                                      PIN_AFIO_AF(GPIOE_PIN6, 0U) |          \
                                      PIN_AFIO_AF(GPIOE_PIN7, 0U))
-#define VAL_GPIOE_AFRH              (PIN_AFIO_AF(GPIOE_PIN8, 0U) |          \
+#define VAL_GPIOE_AFRH              (PIN_AFIO_AF(GPIOE_EXT_DIO1, 0U) |      \
                                      PIN_AFIO_AF(GPIOE_PIN9, 0U) |          \
                                      PIN_AFIO_AF(GPIOE_PIN10, 0U) |         \
                                      PIN_AFIO_AF(GPIOE_PIN11, 0U) |         \
