@@ -218,9 +218,6 @@ void ModulePlayer::Stop(void)
 
 void ModulePlayer::Volume(uint8_t volume)
 {
-//    m_codecMutex.lock();
-//    VS1053SetVolume(m_codec, volume, volume);
-//    m_codecMutex.lock();
     Message* msg = (Message*)m_MsgObjectPool.alloc();
     if (msg != NULL)
     {
@@ -346,8 +343,15 @@ void ModulePlayer::PumpThread::main()
         if (pumpData == true)
         {
             FRESULT err = f_open(&fsrc, m_pathbuffer, FA_READ);
-            if (err == FR_OK)
-            {
+            if (err == FR_OK) {
+
+                m_codecMutex.lock();
+                {
+                    VS1053EnableExternalDACInterface(CODEC);
+                }
+                m_codecMutex.unlock();
+
+
                 bool bReadStreamHeader = true;
                 uint16_t headerDater[2];
                 uint16_t codecStatus;
@@ -472,6 +476,7 @@ void ModulePlayer::PumpThread::main()
                 m_codecMutex.lock();
                 {
                     VS1053StopPlaying(CODEC);
+                    VS1053DisableExternalDACInterface(CODEC);
                 }
                 m_codecMutex.unlock();
             }
@@ -488,6 +493,8 @@ void ModulePlayer::PumpThread::main()
         }
         chThdSleep(MS2ST(100));
     }
+
+
 }
 
 }
