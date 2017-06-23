@@ -109,6 +109,9 @@ void ModuleMusicbox::ThreadMain() {
 
     RegisterButtonEvents();
 
+    /*Set external pin to high to notify external systems that the music box is ready*/
+    ledOn(EXT_READY);
+
     while (!chThdShouldTerminateX())
     {
         eventmask_t evt = chEvtWaitAny(ALL_EVENTS);
@@ -142,6 +145,8 @@ void ModuleMusicbox::ThreadMain() {
             }
         }
     }
+
+    ledOff(EXT_READY);
 
     UnregisterButtonEvents();
 
