@@ -101,7 +101,7 @@ bool sdc_lld_is_card_inserted(SDCDriver *sdcp) {
 bool sdc_lld_is_write_protected(SDCDriver *sdcp) {
 
   (void)sdcp;
-  return TRUE;
+  return FALSE;
 }
 #endif
 
@@ -144,10 +144,6 @@ void boardInit(void)
     nvmmemoryObjectInit(&nvm_memory_bkpsram);
 #endif /* STM32_BKPRAM_ENABLE == TRUE */
 #endif /* HAL_USE_NVM_MEMORY */
-
-#if HAL_USE_SERIAL
-    sdInit();
-#endif /* HAL_USE_SERIAL */
 
 #if HAL_USE_SDC
     sdcObjectInit (&SDCD1);
@@ -212,10 +208,6 @@ void boardStart(void)
 #endif /* HAL_USE_FLASH */
 #endif /* defined(NDEBUG) */
 
-#if HAL_USE_SERIAL
-    sdStart(&SD6,NULL);
-#endif /* HAL_USE_SERIAL */
-
  #if HAL_USE_SDC
     sdcStart(&SDCD1, &sdccfg);
 #endif /* HAL_USE_SDC */
@@ -232,10 +224,6 @@ void boardStop(void)
 #if HAL_USE_SDC
     sdcStop(&SDCD1);
 #endif /* HAL_USE_SDC */
-
-#if HAL_USE_SERIAL
-    sdStop(&SD6);
-#endif /* HAL_USE_SERIAL */
 
     /* nvm memory drivers */
 #if HAL_USE_NVM_MEMORY
