@@ -1,5 +1,15 @@
-language: cpp
+sudo: false
+dist: trusty
 
-install: make arm_sdk_install
+addons:
+  apt:
+    packages:
+    - gcc-multilib
+    - g++-multilib
 
-script: make all
+language: c
+
+before_script:
+  - make -j2 arm_sdk_install gtest_install
+
+script: make -j2 all all_ut && make all_ut_run
