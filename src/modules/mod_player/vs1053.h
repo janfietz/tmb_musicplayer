@@ -131,6 +131,8 @@ extern "C" {
   uint16_t VS1053ReadStatus(VS1053Driver* VS1053p);
   uint16_t VS1053ReadSampleRate(VS1053Driver* VS1053p);
   void VS1053GiveBus(VS1053Driver* VS1053p);
+  void VS1053EnableExternalDACInterface(VS1053Driver* VS1053p);
+  void VS1053DisableExternalDACInterface(VS1053Driver* VS1053p);
 #ifdef __cplusplus
 }
 #endif

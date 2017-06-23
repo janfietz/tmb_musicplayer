@@ -386,6 +386,31 @@ void VS1053GiveBus(VS1053Driver* VS1053p)
     ActivateSCI(VS1053p);
 }
 
+void VS1053EnableExternalDACInterface(VS1053Driver* VS1053p) {
+    osalDbgCheck(VS1053p != NULL);
+
+    osalSysLock();
+    osalDbgAssert(VS1053p->state == VS1053_ACTIVE, "invalid state");
+    osalSysUnlock();
+
+
+    /*Reconfigure GPIO to I2S*/
+    WriteRegister(VS1053p, SCI_WRAMADDR, 0xc0, 0x17);
+    WriteRegister(VS1053p, SCI_WRAM, 0x00, 0xf0);
+
+    /*
+     * Configure I2S
+     * MCLK output enabled, Enable I2S, 48kHz sample rate
+     */
+    WriteRegister(VS1053p, SCI_WRAMADDR, 0xc0, 0x40);
+    WriteRegister(VS1053p, SCI_WRAM, 0x00, 0x0c);
+}
+
+void VS1053DisableExternalDACInterface(VS1053Driver* VS1053p) {
+    WriteRegister(VS1053p, SCI_WRAMADDR, 0xc0, 0x40);
+    WriteRegister(VS1053p, SCI_WRAM, 0x00, 0x00);
+}
+
 #endif /* HAL_USE_VS1053 */
 
 /** @} */
