@@ -80,7 +80,8 @@ void ModuleCardreader::ThreadMain()
 #if HAL_USE_BUTTONS
     BoardButtons::BtnCardDetect.RegisterListener(&carddetectEvtListener, EVENT_MASK(0));
 #endif
-    //if (m_carddetectButton->GetState() == false)
+
+    if (BoardButtons::BtnCardDetect.GetState() == false)
     {
         OnCardInserted();
     }
@@ -93,11 +94,11 @@ void ModuleCardreader::ThreadMain()
             eventflags_t flags = carddetectEvtListener.getAndClearFlags();
             if (flags & Button::Up)
             {
-                OnCardInserted();
+                OnCardRemoved();
             }
             else if (flags & Button::Down)
             {
-                OnCardRemoved();
+                OnCardInserted();
             }
         }
     }
