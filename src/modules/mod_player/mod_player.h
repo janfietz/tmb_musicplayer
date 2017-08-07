@@ -65,7 +65,8 @@ public:
         EventPlay = 1 << 0,
         EventPause = 1 << 1,
         EventStop = 1 << 2,
-        EventAbort = 1 << 3
+        EventAbort = 1 << 3,
+        EventSpectrum = 1 << 4
     };
 
     ModulePlayer();
@@ -79,6 +80,7 @@ public:
     void Toggle(void);
     void Stop(void);
     void Volume(uint8_t volume);
+    void QuerySpectrumAnalyzerResult(VS1053SpectrumAnalyzerResult& spectrum);
 
     void RegisterListener(chibios_rt::EvtListener* listener, eventmask_t mask);
     void UnregisterListener(chibios_rt::EvtListener* listener);
@@ -133,6 +135,7 @@ private:
        void SetBasePath(const char* path);
        void ResetPathtoBase();
        void ResetPath();
+       void ReadSpectrumAnalyzerResult(VS1053SpectrumAnalyzerResult& result);
 
     protected:
         virtual void main();
@@ -145,6 +148,8 @@ private:
         void SignalDecodeActionOn();
         void SignalDecodeActionOff();
 
+        void ResetSpectrumResult();
+
         char m_pathbuffer[512];
         uint16_t basePathEndIdx = 0;
 
@@ -153,6 +158,7 @@ private:
         uint8_t m_volume = 0;
         chibios_rt::Mutex m_codecMutex;
         chibios_rt::BaseThread* m_playerThread;
+        VS1053SpectrumAnalyzerResult m_lastSpectrum;
     };
 
     class Message
@@ -168,6 +174,8 @@ private:
     chibios_rt::EvtSource m_evtSource;
     chibios_rt::ObjectsPool<Message, MOD_PLAYER_CMD_QUEUE_SIZE> m_MsgObjectPool;
     chibios_rt::Mailbox<Message*, MOD_PLAYER_CMD_QUEUE_SIZE> m_Mailbox;
+
+
 };
 
 typedef qos::Singleton<ModulePlayer> ModulePlayerSingelton;
