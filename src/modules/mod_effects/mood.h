@@ -19,6 +19,7 @@ class Mood
 public:
     virtual void Draw(systime_t sysTime, DisplayBuffer* display) = 0;
     virtual void SwitchMode(uint8_t mode) = 0;
+    virtual void SetSpectrum(int8_t* current, int8_t* peak, int8_t bands) = 0;
 };
 
 }

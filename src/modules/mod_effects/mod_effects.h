@@ -60,6 +60,7 @@ public:
         ModePause,
         ModeStop,
         ModeEmptyPlaylist,
+        ModeSpectrumResult,
     };
 
     ModuleEffects();
@@ -70,6 +71,7 @@ public:
     virtual void Shutdown();
 
     void SetMode(PlayModes mode);
+    void SetSpectrum(int8_t* current, int8_t* peak, int8_t bands);
 
 protected:
     typedef qos::ThreadedModule<MOD_EFFECTS_THREADSIZE> BaseClass;
@@ -94,7 +96,8 @@ private:
     {
     public:
         PlayModes mode;
-        uint8_t spare1;
+        int8_t spectrumCurrent[5];
+        int8_t spectrumPeak[5];
         uint8_t spare2;
         uint8_t spare3;
     };

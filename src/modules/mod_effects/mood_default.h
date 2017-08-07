@@ -26,11 +26,17 @@ public:
 
     virtual void Draw(systime_t sysTime, DisplayBuffer* display);
     virtual void SwitchMode(uint8_t mode);
+    virtual void SetSpectrum(int8_t* current, int8_t* peak, int8_t bands);
 
 private:
+    void DrawSpectrum(systime_t sysTime, DisplayBuffer* display);
+
     uint8_t m_newMode = EFFECT_BUTTON_MODE_EMPTYPLAYLIST;
     uint8_t m_currentMode = EFFECT_BUTTON_MODE_EMPTYPLAYLIST;
     systime_t m_modeChangedTime;
+
+    int8_t m_spectrumCurrent[5];
+    int8_t m_spectrumPeak[5];
 
     bool m_showButtons = true;
 
@@ -114,6 +120,8 @@ private:
         .reset = &EffectRandomPixelsReset,
         .p_next = NULL,
     };
+
+
 };
 
 }

@@ -293,6 +293,10 @@ void ModuleMusicbox::OnPlayerEvent(eventflags_t flags) {
     } else if (flags & ModulePlayer::EventPause) {
         chprintf(DEBUG_CANNEL, "ModuleMusicbox: player Pause.\r\n");
         m_modEffects->SetMode(ModuleEffects::ModePause);
+    } else if (flags & ModulePlayer::EventSpectrum) {
+        VS1053SpectrumAnalyzerResult spectrum;
+        m_modPlayer->QuerySpectrumAnalyzerResult(spectrum);
+        m_modEffects->SetSpectrum(spectrum.current, spectrum.peak, sizeof(spectrum.current));
     }
 }
 

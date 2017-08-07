@@ -15,6 +15,7 @@
 
 #include "qhal.h"
 #include "chprintf.h"
+#include "evtimer.h"
 
 #include "ff.h"
 #include <stdio.h>
@@ -29,11 +30,13 @@ tmb_musicplayer::ModulePlayer tmb_musicplayer::ModulePlayerSingelton::instance =
 #define EVENTMASK_PUMPTHREAD_STOP EVENT_MASK(0)
 #define EVENTMASK_PUMPTHREAD_START EVENT_MASK(1)
 #define EVENTMASK_PUMPTHREAD_ABORT EVENT_MASK(2)
-#define EVENTMASK_COMMAND_PLAY EVENT_MASK(3)
-#define EVENTMASK_COMMAND_STOP EVENT_MASK(4)
-#define EVENTMASK_COMMAND_VOLUME EVENT_MASK(5)
-#define EVENTMASK_COMMAND_PAUSE EVENT_MASK(6)
-#define EVENTMASK_MAIL EVENT_MASK(7)
+#define EVENTMASK_PUMPTHREAD_NEW_SPECTRUMRESULT EVENT_MASK(3)
+#define EVENTMASK_COMMAND_PLAY EVENT_MASK(4)
+#define EVENTMASK_COMMAND_STOP EVENT_MASK(5)
+#define EVENTMASK_COMMAND_VOLUME EVENT_MASK(6)
+#define EVENTMASK_COMMAND_PAUSE EVENT_MASK(7)
+#define EVENTMASK_MAIL EVENT_MASK(8)
+#define EVENTMASK_PERIODIC_100MS EVENT_MASK(9)
 
 namespace tmb_musicplayer
 {
@@ -102,6 +105,10 @@ void ModulePlayer::ThreadMain()
             }
             hasNewTitle = false;
         }
+        else if (evt & EVENTMASK_PUMPTHREAD_NEW_SPECTRUMRESULT)
+        {
+            m_evtSource.broadcastFlags(EventSpectrum);
+        }
         else if (evt & EVENTMASK_MAIL)
         {
             /* Processing the event.*/
@@ -131,8 +138,6 @@ void ModulePlayer::ThreadMain()
                 }
 
                 m_MsgObjectPool.free(msg);
-
-
             }
         }
         else if (evt & EVENTMASK_COMMAND_PLAY)
@@ -218,9 +223,6 @@ void ModulePlayer::Stop(void)
 
 void ModulePlayer::Volume(uint8_t volume)
 {
-//    m_codecMutex.lock();
-//    VS1053SetVolume(m_codec, volume, volume);
-//    m_codecMutex.lock();
     Message* msg = (Message*)m_MsgObjectPool.alloc();
     if (msg != NULL)
     {
@@ -235,6 +237,11 @@ void ModulePlayer::Volume(uint8_t volume)
             m_MsgObjectPool.free(msg);
         }
     }
+}
+
+void ModulePlayer::QuerySpectrumAnalyzerResult(VS1053SpectrumAnalyzerResult& spectrum)
+{
+    m_pumpThread.ReadSpectrumAnalyzerResult(spectrum);
 }
 
 ModulePlayer::PumpThread::PumpThread()
@@ -277,6 +284,13 @@ void ModulePlayer::PumpThread::SetVolume(uint8_t volume)
         VS1053SetVolume(CODEC, volume, volume);
     }
     m_codecMutex.unlock();
+}
+
+void ModulePlayer::PumpThread::ReadSpectrumAnalyzerResult(VS1053SpectrumAnalyzerResult& result)
+{
+    chibios_rt::System::lock();
+    memcpy(&result, &m_lastSpectrum, sizeof(m_lastSpectrum));
+    chibios_rt::System::unlock();
 }
 
 void ModulePlayer::PumpThread::SetBasePath(const char* path)
@@ -334,8 +348,11 @@ void ModulePlayer::PumpThread::main()
     UINT ByteToRead = sizeof(Buffer);
     UINT ByteRead;
 
+    systime_t lastSpectrumFetchTime = chVTGetSystemTimeX();
+
     FIL fsrc;
     bool pumpData = false;
+
     while (chThdShouldTerminateX() == false)
     {
         watchdog_reload(WATCHDOG_MOD_PLAYER_PUMP);
@@ -345,6 +362,8 @@ void ModulePlayer::PumpThread::main()
         bool aborted = true;
         if (pumpData == true)
         {
+            lastSpectrumFetchTime = chVTGetSystemTimeX();
+
             FRESULT err = f_open(&fsrc, m_pathbuffer, FA_READ);
             if (err == FR_OK)
             {
@@ -411,6 +430,19 @@ void ModulePlayer::PumpThread::main()
 
                             byteTransferred = byteTransferred + ByteRead;
 
+                            /*check spectrum result*/
+                            systime_t now = chVTGetSystemTimeX();
+                            if ((now - lastSpectrumFetchTime) >= MS2ST(100))
+                            {
+                                m_codecMutex.lock();
+                                {
+                                    VS1053ReadSpectrumAnalyzerResult(CODEC, &m_lastSpectrum);
+                                    m_playerThread->signalEvents(EVENTMASK_PUMPTHREAD_NEW_SPECTRUMRESULT);
+                                }
+                                m_codecMutex.unlock();
+                                lastSpectrumFetchTime = now;
+                            }
+
                             if (bReadStreamHeader == true)
                             {
                                 m_codecMutex.lock();
@@ -465,8 +497,6 @@ void ModulePlayer::PumpThread::main()
                     }
                 } while (ByteRead >= ByteToRead);
 
-
-
                 f_close(&fsrc);
 
                 m_codecMutex.lock();
@@ -478,6 +508,7 @@ void ModulePlayer::PumpThread::main()
 
             chibios_rt::System::lock();
             m_pump = false;
+            ResetSpectrumResult();
             chibios_rt::System::unlock();
 
             if (aborted) {
@@ -488,6 +519,16 @@ void ModulePlayer::PumpThread::main()
         }
         chThdSleep(MS2ST(100));
     }
+}
+
+void  ModulePlayer::PumpThread::ResetSpectrumResult()
+{
+    for (int16_t i = 0; i < VS1053_SPECTRUM_BANDS; i++)
+    {
+        m_lastSpectrum.current[i] = 0;
+        m_lastSpectrum.peak[i] = 0;
+    }
+    m_playerThread->signalEvents(EVENTMASK_PUMPTHREAD_NEW_SPECTRUMRESULT);
 }
 
 }
