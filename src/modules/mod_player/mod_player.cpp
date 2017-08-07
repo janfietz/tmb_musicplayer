@@ -508,8 +508,8 @@ void ModulePlayer::PumpThread::main()
 
             chibios_rt::System::lock();
             m_pump = false;
-            ResetSpectrumResult();
             chibios_rt::System::unlock();
+            ResetSpectrumResult();
 
             if (aborted) {
                 m_playerThread->signalEvents(EVENTMASK_PUMPTHREAD_ABORT);
