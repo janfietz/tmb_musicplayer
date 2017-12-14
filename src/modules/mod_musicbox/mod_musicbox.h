@@ -106,6 +106,8 @@ private:
     bool FindUIDDirectory(const char* pszUID);
     bool FindPlaylistFile(const char* path);
 
+    void SetReadyOutput(bool on);
+
     static size_t MifareUIDToString(const MifareUID& uid, char* psz);
 
     bool hasRFIDCard = false;

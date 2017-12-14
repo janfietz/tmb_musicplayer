@@ -109,6 +109,12 @@ void ModuleMusicbox::ThreadMain() {
 
     RegisterButtonEvents();
 
+    /*
+     * Set external output to notify ready state
+     */
+
+    SetReadyOutput(true);
+
     while (!chThdShouldTerminateX())
     {
         eventmask_t evt = chEvtWaitAny(ALL_EVENTS);
@@ -273,6 +279,11 @@ void ModuleMusicbox::OnCardReaderEvent(eventflags_t flags)
                     ProcessMifareUID(pszUID);
                 }
             }
+        }
+        else
+        {
+            //hasRFIDCard = true;
+            //ProcessMifareUID("043df3fa094081");
         }
     }
 
@@ -541,6 +552,20 @@ void ModuleMusicbox::AddFilesToPlaylist(char* path, uint32_t pathLength, File& p
             }
         }
     }
+}
+
+void ModuleMusicbox::SetReadyOutput(bool on) {
+#if HAL_USE_LED
+    if (on == true)
+    {
+        ledOn(EXTO_READY);
+    }
+    else
+    {
+        ledOff(EXTO_READY);
+    }
+#endif /* HAL_USE_LED */
+
 }
 
 
