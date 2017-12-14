@@ -21,6 +21,7 @@
 #include "module_init_cpp.h"
 
 #include "ff.h"
+#include "minIni.h"
 
 #include "board_buttons.h"
 #include "mod_rfid.h"
@@ -224,7 +225,7 @@ void ModuleMusicbox::OnVolUpButton(Button* btn, eventflags_t flags)
     if (flags & Button::Pressed)
     {
         chprintf(DEBUG_CANNEL, "ModuleMusicbox: VolUp button pressed event.\r\n");
-        ChangeVolume(-10);
+        SetVolume(volume - 10);
     }
 }
 
@@ -234,7 +235,7 @@ void ModuleMusicbox::OnVolDownButton(Button* btn, eventflags_t flags)
     if (flags & Button::Pressed)
     {
         chprintf(DEBUG_CANNEL, "ModuleMusicbox: VolDown button pressed event.\r\n");
-        ChangeVolume(10);
+        SetVolume(volume + 10);
     }
 }
 
@@ -268,6 +269,7 @@ void ModuleMusicbox::OnCardReaderEvent(eventflags_t flags)
 {
     if (flags & ModuleCardreader::FilesystemMounted)
     {
+        ReadSettings();
         if (hasRFIDCard == true)
         {
             if (m_modRFID->GetCurrentCardId(uid) == true)
@@ -323,21 +325,6 @@ void ModuleMusicbox::DoAutoNext() {
     } else {
         m_modEffects->SetMode(ModuleEffects::ModeEmptyPlaylist);
     }
-}
-
-void ModuleMusicbox::ChangeVolume(int16_t diff)
-{
-    volume = volume + diff;
-    if (volume < 0)
-    {
-        volume = 0;
-    }
-    else if (volume > 254)
-    {
-        volume = 254;
-    }
-
-    m_modPlayer->Volume((uint8_t)volume);
 }
 
 void ModuleMusicbox::ProcessMifareUID(const char* pszUID)
@@ -552,6 +539,27 @@ void ModuleMusicbox::AddFilesToPlaylist(char* path, uint32_t pathLength, File& p
             }
         }
     }
+}
+
+void ModuleMusicbox::ReadSettings() {
+    int16_t vol = ini_getl("General","volume", 50, "/musicbox.ini"); // read initial volume setting 0-254
+    SetVolume(vol);
+    chprintf(DEBUG_CANNEL, "ModuleMusicbox: Settings volume: %d\r\n", volume);
+}
+
+void ModuleMusicbox::SetVolume(int16_t vol)
+{
+    volume = vol;
+    if (volume < 0)
+    {
+        volume = 0;
+    }
+    else if (volume > 254)
+    {
+        volume = 254;
+    }
+
+    m_modPlayer->Volume((uint8_t)volume);
 }
 
 void ModuleMusicbox::SetReadyOutput(bool on) {

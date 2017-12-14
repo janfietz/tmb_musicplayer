@@ -97,7 +97,6 @@ private:
     void RegisterButtonEvents();
     void UnregisterButtonEvents();
 
-    void ChangeVolume(int16_t diff);
     void ProcessMifareUID(const char* pszUID);
     bool LoadPlaylist(const char* fileName);
     void DoAutoNext();
@@ -106,6 +105,8 @@ private:
     bool FindUIDDirectory(const char* pszUID);
     bool FindPlaylistFile(const char* path);
 
+    void ReadSettings();
+    void SetVolume(int16_t vol);
     void SetReadyOutput(bool on);
 
     static size_t MifareUIDToString(const MifareUID& uid, char* psz);
