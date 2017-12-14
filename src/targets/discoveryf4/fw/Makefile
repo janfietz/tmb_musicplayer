@@ -33,6 +33,9 @@ include $(ROOT_DIR)/submodules/tmb_effects/library.mk
 include $(ROOT_DIR)/submodules/fatfs/library.mk
 include $(ROOT_DIR)/submodules/qos/various/fatfs_bindings/library.mk
 
+# MININI
+include $(ROOT_DIR)/submodules/minini/library.mk
+
 # List modules to include in this build here
 MODULES += $(notdir $(wildcard $(ROOT_DIR)/src/modules/*))
 
