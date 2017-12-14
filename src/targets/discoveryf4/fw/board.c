@@ -92,6 +92,8 @@ void boardInit(void)
     ledObjectInit(&LED4);
     ledObjectInit(&LED5);
     ledObjectInit(&LED6);
+
+    ledObjectInit(&EXTO1);
 #endif /* HAL_USE_LED */
 
     /* Internal flash */
@@ -156,6 +158,8 @@ void boardStart(void)
     ledStart(&LED4, &led_4_cfg);
     ledStart(&LED5, &led_5_cfg);
     ledStart(&LED6, &led_6_cfg);
+
+    ledStart(&EXTO1, &exto_1_cfg);
 #endif /* HAL_USE_LED */
 
 #if HAL_USE_SERIAL
@@ -276,6 +280,9 @@ void boardStop(void)
     ledStop(&LED2);
     ledOff(&LED1);
     ledStop(&LED1);
+
+    ledOff(&EXTO1);
+    ledStop(&EXTO1);
 #endif /* HAL_USE_LED */
 
     /* Stop watchdog */

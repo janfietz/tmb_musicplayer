@@ -24,6 +24,8 @@
 #define LED_DECODE              &LED2
 #define LED_RFID                &LED4
 
+#define EXTO_READY              &EXTO1
+
 #define CODEC                   &VS1053D1
 
 #define PARTITION_BL            ((BaseNVMDevice*)&nvm_part_internal_flash_bl)

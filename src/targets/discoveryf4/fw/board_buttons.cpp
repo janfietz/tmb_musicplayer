@@ -4,7 +4,7 @@
 
 #if HAL_USE_BUTTONS
 
-tmb_musicplayer::Button BoardButtons::BtnPlay(GPIOE, 3);
+tmb_musicplayer::Button BoardButtons::BtnPlay(GPIOE, 7);
 tmb_musicplayer::Button BoardButtons::BtnNext(GPIOE, 2);
 tmb_musicplayer::Button BoardButtons::BtnPrev(GPIOE, 4);
 tmb_musicplayer::Button BoardButtons::BtnVolUp(GPIOE, 1);
