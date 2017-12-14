@@ -126,6 +126,14 @@ static const LedConfig led_6_cfg =
     .drive = LED_ACTIVE_HIGH,
 };
 
+LedDriver EXTO1;
+static const LedConfig exto_1_cfg =
+{
+    .ledport = GPIOE,
+    .ledpad = 8U,
+    .drive = LED_ACTIVE_LOW,
+};
+
 #endif /* HAL_USE_LED */
 
 #if HAL_USE_FLASH
