@@ -113,12 +113,12 @@ void ModuleMusicbox::ThreadMain() {
     /*
      * Set external output to notify ready state
      */
-
-    SetReadyOutput(true);
+    bool setReadyOutput = true;
+    uint8_t readyCounter = 0;
 
     while (!chThdShouldTerminateX())
     {
-        eventmask_t evt = chEvtWaitAny(ALL_EVENTS);
+        eventmask_t evt = chEvtWaitAnyTimeout(ALL_EVENTS, MS2ST(500));
         if (evt & EVENTMASK_RFID)
         {
             eventflags_t flags = rfidEvtListener.getAndClearFlags();
@@ -147,6 +147,15 @@ void ModuleMusicbox::ThreadMain() {
                 eventflags_t flags = btnData.evtListener.getAndClearFlags();
                 (this->*btnData.handler)(btnData.button, flags);
             }
+        }
+
+        /*
+         * Delay for external output is 2 * 500ms
+         */
+        if (setReadyOutput && (++readyCounter > 2))
+        {
+            setReadyOutput = false;
+            SetReadyOutput(true);
         }
     }
 
