@@ -45,27 +45,27 @@ private:
         .play = {
             .x = 2,
             .y = 0,
-            .color = {0x51, 0xBD, 0x1f},
+            .color = {0x51, 0xBD, 0x1F},
         },
         .vol_up = {
             .x = 4,
             .y = 0,
-            .color = {0x00, 0xFF, 0xBF},
+            .color = {0x46, 0x08, 0x4E},
         },
         .vol_down = {
             .x = 0,
             .y = 0,
-            .color = {0x00, 0x8D, 0x6A},
+            .color = {0x46, 0x08, 0x4E},
         },
         .next = {
             .x = 3,
             .y = 0,
-            .color = {0xFF, 0x00, 0x2D},
+            .color = {0xFF, 0xD6, 0x00},
         },
         .prev = {
             .x = 1,
             .y = 0,
-            .color = {0x9D, 0x00, 0x1C},
+            .color = {0xFF, 0xD6, 0x00},
         },
         .special = {
             .x = 5,
@@ -75,7 +75,7 @@ private:
 
         .playMode = EFFECT_BUTTON_MODE_EMPTYPLAYLIST,
         .colorModeEmptyPlayList = {0x29, 0x00, 0x02},
-        .colorModePause = {0x28, 0x5F, 0x0F},
+        .colorModePause = {0xFF, 0x6D, 0x00},
         .colorModeStop = {0xE4, 0x24, 0x2E},
 
         .blendperiod = MS2ST(500),
