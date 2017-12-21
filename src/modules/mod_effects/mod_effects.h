@@ -61,6 +61,7 @@ public:
         ModeStop,
         ModeEmptyPlaylist,
         ModeSpectrumResult,
+        ModeBrightness,
     };
 
     ModuleEffects();
@@ -71,6 +72,7 @@ public:
     virtual void Shutdown();
 
     void SetMode(PlayModes mode);
+    void SetBrightness(float brightness);
     void SetSpectrum(int8_t* current, int8_t* peak, int8_t bands);
 
 protected:
@@ -82,6 +84,7 @@ protected:
 private:
     void DrawCurrentMood();
 
+    float m_brightness = 0.9f; // do not use full brightness
     Color displayPixel[LEDCOUNT];
     DisplayBuffer display =
     {
@@ -100,6 +103,7 @@ private:
         int8_t spectrumPeak[5];
         uint8_t spare2;
         uint8_t spare3;
+        float brightness;
     };
 
 

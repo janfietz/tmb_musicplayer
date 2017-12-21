@@ -91,6 +91,21 @@ void ModuleEffects::SetSpectrum(int8_t* current, int8_t* peak, int8_t bands)
     }
 }
 
+void ModuleEffects::SetBrightness(float brightness)
+{
+    Msg* msg = (Msg*)m_MsgObjectPool.alloc();
+    if (msg != NULL)
+    {
+        msg->mode = ModeBrightness;
+        msg->brightness = brightness;
+
+        if (m_Mailbox.post(msg, MS2ST(1)) != MSG_OK)
+        {
+            m_MsgObjectPool.free(msg);
+        }
+    }
+}
+
 void ModuleEffects::ThreadMain()
 {
     chRegSetThreadName("effects");
@@ -109,6 +124,10 @@ void ModuleEffects::ThreadMain()
            if (msg->mode == ModeSpectrumResult)
            {
                currentMood->SetSpectrum(msg->spectrumCurrent, msg->spectrumPeak, sizeof(msg->spectrumPeak));
+           }
+           else if (msg->mode == ModeBrightness)
+           {
+               m_brightness = msg->brightness;
            }
            else {
                if (currentMode != msg->mode)
@@ -137,7 +156,11 @@ void ModuleEffects::DrawCurrentMood()
 #if HAL_USE_WS281X
     for (i = 0; i < LEDCOUNT; i++)
     {
-        const Color* color = &display.pixels[i];
+        Color* color = &display.pixels[i];
+        /*
+         * Scale brightness using a factor from global settings.
+         */
+        ColorScale(color, m_brightness);
         ws281xSetColor(&ws281x, i, color->R, color->G, color->B);
     }
 
