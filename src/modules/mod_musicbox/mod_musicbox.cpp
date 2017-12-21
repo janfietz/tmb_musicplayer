@@ -554,6 +554,16 @@ void ModuleMusicbox::ReadSettings() {
     int16_t vol = ini_getl("General","volume", 50, "/musicbox.ini"); // read initial volume setting 0-254
     SetVolume(vol);
     chprintf(DEBUG_CANNEL, "ModuleMusicbox: Settings volume: %d\r\n", volume);
+
+    int16_t brightness = ini_getl("General","brightness", 90, "/musicbox.ini"); // read LED brightness
+    if (brightness > 100 || brightness < 1)
+    {
+        chprintf(DEBUG_CANNEL, "ModuleMusicbox: Invalid brightness setting. Use 100 .. 1 \r\n");
+    }
+    else
+    {
+        m_modEffects->SetBrightness((float)brightness * 0.01f);
+    }
 }
 
 void ModuleMusicbox::SetVolume(int16_t vol)

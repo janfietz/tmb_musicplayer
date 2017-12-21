@@ -6,4 +6,5 @@
 ```
 [General]
 volume=100 #0-255
+brightness=90 #100-1
 ```
