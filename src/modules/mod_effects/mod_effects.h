@@ -25,7 +25,7 @@
 /* Module pre-compile time settings.                                         */
 /*===========================================================================*/
 #ifndef MOD_EFFECTS_THREADSIZE
-#define MOD_EFFECTS_THREADSIZE 256
+#define MOD_EFFECTS_THREADSIZE 512
 #endif
 
 #ifndef MOD_EFFECTS_THREADPRIO
@@ -60,7 +60,10 @@ public:
         ModePause,
         ModeStop,
         ModeEmptyPlaylist,
+        ModeStandby,
+        ModeDeepStandby,
         ModeSpectrumResult,
+        ModeBrightness,
     };
 
     ModuleEffects();
@@ -71,6 +74,7 @@ public:
     virtual void Shutdown();
 
     void SetMode(PlayModes mode);
+    void SetBrightness(float brightness);
     void SetSpectrum(int8_t* current, int8_t* peak, int8_t bands);
 
 protected:
@@ -82,6 +86,7 @@ protected:
 private:
     void DrawCurrentMood();
 
+    float m_brightness = 0.9f; // do not use full brightness
     Color displayPixel[LEDCOUNT];
     DisplayBuffer display =
     {
@@ -100,6 +105,7 @@ private:
         int8_t spectrumPeak[5];
         uint8_t spare2;
         uint8_t spare3;
+        float brightness;
     };
 
 

@@ -116,6 +116,7 @@ void ModuleMusicbox::ThreadMain() {
     bool setReadyOutput = true;
     uint8_t readyCounter = 0;
 
+    GoStateStop();
     while (!chThdShouldTerminateX())
     {
         eventmask_t evt = chEvtWaitAnyTimeout(ALL_EVENTS, MS2ST(500));
@@ -156,6 +157,22 @@ void ModuleMusicbox::ThreadMain() {
         {
             setReadyOutput = false;
             SetReadyOutput(true);
+        }
+
+        /*
+         *
+         */
+        if (stopped == true)
+        {
+            systime_t now = chVTGetSystemTimeX();
+            if ((isInDeepStandby == false) && ((now - lastStop) >= S2ST(deepStandbyTime)))
+            {
+                GoStateDeepStandby();
+            }
+            else if ((isInStandby == false) && ((now - lastStop) >= S2ST(standbyTime)))
+            {
+                GoStateStandby();
+            }
         }
     }
 
@@ -258,6 +275,9 @@ void ModuleMusicbox::OnRFIDEvent(eventflags_t flags)
             char pszUID[32];
             if (MifareUIDToString(uid, pszUID) > 0)
             {
+                m_modEffects->SetMode(ModuleEffects::ModeEmptyPlaylist);
+                lastStop = chVTGetSystemTimeX();
+
                 chprintf(DEBUG_CANNEL, "ModuleMusicbox: RFID detected: %s.\r\n", pszUID);
                 ProcessMifareUID(pszUID);
             }
@@ -271,6 +291,7 @@ void ModuleMusicbox::OnRFIDEvent(eventflags_t flags)
         m_modPlayer->Stop();
 
         m_modEffects->SetMode(ModuleEffects::ModeEmptyPlaylist);
+        GoStateStop();
     }
 }
 
@@ -302,6 +323,7 @@ void ModuleMusicbox::OnCardReaderEvent(eventflags_t flags)
     {
         m_modPlayer->Stop();
         m_modEffects->SetMode(ModuleEffects::ModeEmptyPlaylist);
+        GoStateStop();
     }
 }
 
@@ -309,12 +331,15 @@ void ModuleMusicbox::OnPlayerEvent(eventflags_t flags) {
     if (flags & ModulePlayer::EventPlay) {
         chprintf(DEBUG_CANNEL, "ModuleMusicbox: player Play.\r\n");
         m_modEffects->SetMode(ModuleEffects::ModePlay);
+        GoStatePlay();
     } else if (flags & ModulePlayer::EventStop) {
         chprintf(DEBUG_CANNEL, "ModuleMusicbox: player Stop.\r\n");
         DoAutoNext();
     } else if (flags & ModulePlayer::EventPause) {
         chprintf(DEBUG_CANNEL, "ModuleMusicbox: player Pause.\r\n");
         m_modEffects->SetMode(ModuleEffects::ModePause);
+        GoStateStop();
+
     } else if (flags & ModulePlayer::EventSpectrum) {
         VS1053SpectrumAnalyzerResult spectrum;
         m_modPlayer->QuerySpectrumAnalyzerResult(spectrum);
@@ -330,9 +355,11 @@ void ModuleMusicbox::DoAutoNext() {
             m_modPlayer->Play(absoluteFileNameBuffer);
         } else {
             m_modEffects->SetMode(ModuleEffects::ModeStop);
+            GoStateStop();
         }
     } else {
         m_modEffects->SetMode(ModuleEffects::ModeEmptyPlaylist);
+        GoStateStop();
     }
 }
 
@@ -550,10 +577,61 @@ void ModuleMusicbox::AddFilesToPlaylist(char* path, uint32_t pathLength, File& p
     }
 }
 
+void ModuleMusicbox::GoStatePlay()
+{
+    stopped = false;
+    lastStop = 0;
+
+    if (isInDeepStandby == true)
+    {
+        SetReadyOutput(true);
+    }
+    isInDeepStandby = false;
+    isInStandby = false;
+}
+
+void ModuleMusicbox::GoStateStop()
+{
+    if (stopped == false)
+    {
+        stopped = true;
+        lastStop = chVTGetSystemTimeX();
+    }
+}
+
+void ModuleMusicbox::GoStateStandby()
+{
+    if (isInStandby == false)
+    {
+        m_modEffects->SetMode(ModuleEffects::ModeStandby);
+        isInStandby = true;
+    }
+}
+
+void ModuleMusicbox::GoStateDeepStandby()
+{
+    if (isInDeepStandby == true)
+    {
+        m_modEffects->SetMode(ModuleEffects::ModeDeepStandby);
+        SetReadyOutput(false);
+        isInDeepStandby = false;
+    }
+}
+
 void ModuleMusicbox::ReadSettings() {
     int16_t vol = ini_getl("General","volume", 50, "/musicbox.ini"); // read initial volume setting 0-254
     SetVolume(vol);
     chprintf(DEBUG_CANNEL, "ModuleMusicbox: Settings volume: %d\r\n", volume);
+
+    int16_t brightness = ini_getl("General","brightness", 90, "/musicbox.ini"); // read LED brightness
+    if (brightness > 100 || brightness < 1)
+    {
+        chprintf(DEBUG_CANNEL, "ModuleMusicbox: Invalid brightness setting. Use 100 .. 1 \r\n");
+    }
+    else
+    {
+        m_modEffects->SetBrightness((float)brightness * 0.01f);
+    }
 }
 
 void ModuleMusicbox::SetVolume(int16_t vol)

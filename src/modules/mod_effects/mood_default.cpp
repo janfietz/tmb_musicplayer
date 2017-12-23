@@ -18,9 +18,7 @@ MoodDefault::~MoodDefault() {
 }
 
 void MoodDefault::SwitchMode(uint8_t mode) {
-    if (mode <= EFFECT_BUTTON_MODE_EMPTYPLAYLIST) {
-        m_newMode = mode;
-    }
+    m_newMode = mode;
 }
 
 void MoodDefault::SetSpectrum(int8_t* current, int8_t* peak, int8_t bands)
@@ -30,25 +28,53 @@ void MoodDefault::SetSpectrum(int8_t* current, int8_t* peak, int8_t bands)
 }
 
 void MoodDefault::Draw(systime_t sysTime, DisplayBuffer* display) {
+
     if (m_newMode != m_currentMode) {
         m_currentMode = m_newMode;
-        effButtons_cfg.playMode = m_currentMode;
+        if (m_currentMode <= EFFECT_BUTTON_MODE_EMPTYPLAYLIST) {
+            effButtons_cfg.playMode = m_currentMode;
+        }
         m_modeChangedTime = sysTime;
         m_showButtons = true;
+
+        if (m_newMode == 4)
+        {
+            const uint32_t pixelCount = display->height * display->width;
+            for (uint32_t i = 0; i < pixelCount; i++)
+            {
+                ColorCopy(&display->pixels[i], &m_RandomPixelColors[i]);
+                m_fadeStates[i].fadesequence = 0;
+            }
+            EffectReset(&effFadingPixel, 0, 0, sysTime);
+        }
     }
 
-    if (m_showButtons) {
-        EffectUpdate(&effButtons, 0, 0, sysTime, display);
+    const int16_t pixelCount = display->height * display->width;
+    memset(display->pixels, 0, sizeof(struct Color) * pixelCount);
 
-        if ((sysTime - m_modeChangedTime) >= MS2ST(10000)) {
-            m_showButtons = false;
-        }
-    } else {
-        if (m_currentMode == EFFECT_BUTTON_MODE_PLAY) {
-            //EffectUpdate(&effRandomPixel, 0, 0, sysTime, display);
-            DrawSpectrum(sysTime, display);
-        } else {
+    if (m_currentMode == 4)
+    {
+        EffectUpdate(&effFadingPixel, 0, 0, sysTime, display);
+
+    }
+    else if (m_currentMode == 5)
+    {
+
+    }
+    else
+    {
+        if (m_showButtons) {
             EffectUpdate(&effButtons, 0, 0, sysTime, display);
+
+            if ((sysTime - m_modeChangedTime) >= MS2ST(10000)) {
+                m_showButtons = false;
+            }
+        } else {
+            if (m_currentMode == EFFECT_BUTTON_MODE_PLAY) {
+                DrawSpectrum(sysTime, display);
+            } else {
+                EffectUpdate(&effButtons, 0, 0, sysTime, display);
+            }
         }
     }
 }

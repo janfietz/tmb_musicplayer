@@ -11,6 +11,7 @@
 
 #include "effect_buttons.h"
 #include "effect_randompixels.h"
+#include "effect_fadingpixels.h"
 #include "mood.h"
 
 namespace tmb_musicplayer
@@ -33,7 +34,10 @@ private:
 
     uint8_t m_newMode = EFFECT_BUTTON_MODE_EMPTYPLAYLIST;
     uint8_t m_currentMode = EFFECT_BUTTON_MODE_EMPTYPLAYLIST;
+    uint8_t m_newButtonMode = EFFECT_BUTTON_MODE_EMPTYPLAYLIST;
+    uint8_t m_currentButtonMode = EFFECT_BUTTON_MODE_EMPTYPLAYLIST;
     systime_t m_modeChangedTime;
+    float brightness = 1.0f;
 
     int8_t m_spectrumCurrent[5];
     int8_t m_spectrumPeak[5];
@@ -45,27 +49,27 @@ private:
         .play = {
             .x = 2,
             .y = 0,
-            .color = {0x51, 0xBD, 0x1f},
+            .color = {0x51, 0xBD, 0x1F},
         },
         .vol_up = {
             .x = 4,
             .y = 0,
-            .color = {0x00, 0xFF, 0xBF},
+            .color = {0x46, 0x08, 0x4E},
         },
         .vol_down = {
             .x = 0,
             .y = 0,
-            .color = {0x00, 0x8D, 0x6A},
+            .color = {0x46, 0x08, 0x4E},
         },
         .next = {
             .x = 3,
             .y = 0,
-            .color = {0xFF, 0x00, 0x2D},
+            .color = {0xFF, 0xD6, 0x00},
         },
         .prev = {
             .x = 1,
             .y = 0,
-            .color = {0x9D, 0x00, 0x1C},
+            .color = {0xFF, 0xD6, 0x00},
         },
         .special = {
             .x = 5,
@@ -75,7 +79,7 @@ private:
 
         .playMode = EFFECT_BUTTON_MODE_EMPTYPLAYLIST,
         .colorModeEmptyPlayList = {0x29, 0x00, 0x02},
-        .colorModePause = {0x28, 0x5F, 0x0F},
+        .colorModePause = {0xFF, 0x6D, 0x00},
         .colorModeStop = {0xE4, 0x24, 0x2E},
 
         .blendperiod = MS2ST(500),
@@ -121,7 +125,31 @@ private:
         .p_next = NULL,
     };
 
+    EffectFadingPixelsCfg effFadingButtons_cfg = {
+        .color = {0xFF, 0xFF, 0xFF},
+        .randomColor = true,
+        .number = 1,
+        .spawninterval = MS2ST(2000),
+        .fadeperiod = MS2ST(2000)
+    };
 
+    EffectFadeState m_fadeStates[5];
+    EffectFadingPixelsData effFadingButtons_data =
+    {
+        .lastspawn = 0,
+        .lastupdate = 0,
+        .fadeStates = m_fadeStates,
+        .pixelColors = m_RandomPixelColors,
+    };
+
+    Effect effFadingPixel =
+    {
+        .effectcfg = &effFadingButtons_cfg,
+        .effectdata = &effFadingButtons_data,
+        .update = &EffectFadingPixelsUpdate,
+        .reset = &EffectFadingPixelsReset,
+        .p_next = NULL,
+    };
 };
 
 }
