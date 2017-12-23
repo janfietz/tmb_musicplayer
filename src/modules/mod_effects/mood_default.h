@@ -11,6 +11,7 @@
 
 #include "effect_buttons.h"
 #include "effect_randompixels.h"
+#include "effect_fadingpixels.h"
 #include "mood.h"
 
 namespace tmb_musicplayer
@@ -33,7 +34,10 @@ private:
 
     uint8_t m_newMode = EFFECT_BUTTON_MODE_EMPTYPLAYLIST;
     uint8_t m_currentMode = EFFECT_BUTTON_MODE_EMPTYPLAYLIST;
+    uint8_t m_newButtonMode = EFFECT_BUTTON_MODE_EMPTYPLAYLIST;
+    uint8_t m_currentButtonMode = EFFECT_BUTTON_MODE_EMPTYPLAYLIST;
     systime_t m_modeChangedTime;
+    float brightness = 1.0f;
 
     int8_t m_spectrumCurrent[5];
     int8_t m_spectrumPeak[5];
@@ -121,7 +125,31 @@ private:
         .p_next = NULL,
     };
 
+    EffectFadingPixelsCfg effFadingButtons_cfg = {
+        .color = {0xFF, 0xFF, 0xFF},
+        .randomColor = true,
+        .number = 1,
+        .spawninterval = MS2ST(2000),
+        .fadeperiod = MS2ST(2000)
+    };
 
+    EffectFadeState m_fadeStates[5];
+    EffectFadingPixelsData effFadingButtons_data =
+    {
+        .lastspawn = 0,
+        .lastupdate = 0,
+        .fadeStates = m_fadeStates,
+        .pixelColors = m_RandomPixelColors,
+    };
+
+    Effect effFadingPixel =
+    {
+        .effectcfg = &effFadingButtons_cfg,
+        .effectdata = &effFadingButtons_data,
+        .update = &EffectFadingPixelsUpdate,
+        .reset = &EffectFadingPixelsReset,
+        .p_next = NULL,
+    };
 };
 
 }

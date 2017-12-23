@@ -148,8 +148,6 @@ void ModuleEffects::DrawCurrentMood()
 {
     int i;
     systime_t current = chVTGetSystemTime();
-    
-    memset(display.pixels, 0, sizeof(struct Color) * LEDCOUNT);
 
     currentMood->Draw(current, &display);
 
