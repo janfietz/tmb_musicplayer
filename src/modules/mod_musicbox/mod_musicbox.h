@@ -69,6 +69,7 @@ public:
     virtual void Shutdown();
 
 protected:
+
     typedef qos::ThreadedModule<MOD_MUSICBOX_THREADSIZE> BaseClass;
 
     virtual void ThreadMain();
@@ -109,10 +110,31 @@ private:
     void SetVolume(int16_t vol);
     void SetReadyOutput(bool on);
 
+
+
     static size_t MifareUIDToString(const MifareUID& uid, char* psz);
 
     bool hasRFIDCard = false;
     int16_t volume = 50;
+
+    /*
+     * a little state machine
+     */
+    bool isInStandby = false;
+    bool isInDeepStandby = false;
+    bool stopped = true;
+    systime_t lastStop = 0;
+
+    void GoStatePlay();
+    void GoStateStop();
+    void GoStateStandby();
+    void GoStateDeepStandby();
+
+    /*
+     * settings for state machine
+     */
+    int16_t deepStandbyTime = 15 * 60; // 15min
+    int16_t standbyTime = 5 * 60; // 5min
 
     ButtonData buttons[ButtonTypeCount];
     MifareUID uid;
